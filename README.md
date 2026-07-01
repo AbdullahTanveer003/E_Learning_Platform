@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # 🎓 E-Learning Platform
 
 A full-stack e-learning platform built with React, Node.js, Express, and MongoDB. Features course creation, video streaming, quiz engine, progress tracking, and certificate generation.
@@ -381,3 +382,6 @@ For questions or issues, please open a GitHub issue or contact the development t
 ---
 
 **Happy Learning! 🚀**
+=======
+# E_Learning_plateform
+>>>>>>> e1fab8a0f5bc19e2eae5f88fca7a757cc0ea4609

@@ -384,4 +384,4 @@ For questions or issues, please open a GitHub issue or contact the development t
 **Happy Learning! 🚀**
 =======
 # E_Learning_plateform
->>>>>>> e1fab8a0f5bc19e2eae5f88fca7a757cc0ea4609
+>>>>>>> 

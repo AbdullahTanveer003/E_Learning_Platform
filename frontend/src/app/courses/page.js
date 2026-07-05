@@ -1,9 +1,13 @@
 "use client";
 import React, { useState, useEffect } from 'react';
-import { BookOpen, Star, ArrowRight, Search, ShieldCheck } from 'lucide-react';
+import { BookOpen, Star, ArrowRight, Search, ShieldCheck, Plus } from 'lucide-react';
 import Link from 'next/link';
+import { useAuth } from '../../context/AuthContext';
 
 export default function CoursesCatalog() {
+  const { user } = useAuth();
+  const isTeacher = user?.role === 'teacher';
+
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -12,7 +16,17 @@ export default function CoursesCatalog() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/courses');
+        let res;
+        if (isTeacher) {
+          // Teachers only see their own courses
+          const token = localStorage.getItem('token');
+          res = await fetch('http://localhost:5000/api/courses/my-courses', {
+            headers: { 'Authorization': `Bearer ${token}` }
+          });
+        } else {
+          // Students see all published courses
+          res = await fetch('http://localhost:5000/api/courses');
+        }
         if (res.ok) {
           const data = await res.json();
           setCourses(data);
@@ -24,7 +38,7 @@ export default function CoursesCatalog() {
       }
     };
     fetchCourses();
-  }, []);
+  }, [isTeacher]);
 
   const categories = ['All', 'Programming', 'Design', 'Business', 'Marketing'];
 
@@ -40,13 +54,25 @@ export default function CoursesCatalog() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
 
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto space-y-4">
-          <h1 className="text-4xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
-            Explore Our Professional Courses
-          </h1>
-          <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-            Find the perfect course to upgrade your skills. Learn from expert instructors and earn certified badges.
-          </p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+          <div>
+            <h1 className="text-4xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+              {isTeacher ? 'My Courses' : 'Explore Our Professional Courses'}
+            </h1>
+            <p className="text-lg mt-2" style={{ color: 'var(--text-secondary)' }}>
+              {isTeacher
+                ? 'Manage and track all the courses you have created.'
+                : 'Find the perfect course to upgrade your skills. Learn from expert instructors and earn certified badges.'}
+            </p>
+          </div>
+          {isTeacher && (
+            <Link
+              href="/dashboard/create-course"
+              className="google-btn google-btn-primary whitespace-nowrap flex items-center gap-2"
+            >
+              <Plus size={18} /> Create New Course
+            </Link>
+          )}
         </div>
 
         {/* Search & Filters */}
@@ -105,14 +131,26 @@ export default function CoursesCatalog() {
             style={{ borderColor: 'var(--border-color)', background: 'var(--bg-secondary)' }}
           >
             <BookOpen className="mx-auto mb-4" style={{ color: 'var(--text-secondary)' }} size={56} />
-            <h3 className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>No courses match your filters</h3>
-            <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Try revising your search query or selecting a different category.</p>
+            {isTeacher ? (
+              <>
+                <h3 className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>You haven't created any courses yet</h3>
+                <p className="mt-2 mb-4" style={{ color: 'var(--text-secondary)' }}>Start by creating your first course!</p>
+                <Link href="/dashboard/create-course" className="inline-flex items-center gap-2 text-blue-600 dark:text-blue-400 font-medium hover:underline">
+                  <Plus size={18} /> Create your first course
+                </Link>
+              </>
+            ) : (
+              <>
+                <h3 className="text-xl font-medium" style={{ color: 'var(--text-primary)' }}>No courses match your filters</h3>
+                <p className="mt-2" style={{ color: 'var(--text-secondary)' }}>Try revising your search query or selecting a different category.</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredCourses.map((course) => (
               <Link
-                href={`/courses/${course._id}`}
+                href={isTeacher ? `/dashboard/courses/${course._id}/edit` : `/courses/${course._id}`}
                 key={course._id}
                 className="flex flex-col justify-between overflow-hidden rounded-xl border shadow-sm transition-all duration-200 hover:shadow-md hover:-translate-y-1 group"
                 style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}

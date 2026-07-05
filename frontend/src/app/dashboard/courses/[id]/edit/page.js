@@ -162,7 +162,6 @@ export default function CourseBuilder() {
           title: newLessonData.title,
           videoUrl: newLessonData.videoUrl,
           duration: Number(newLessonData.duration) || 0,
-          // order could be calculated based on existing lessons, omitting for simplicity
         })
       });
 
@@ -198,9 +197,9 @@ export default function CourseBuilder() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#1a73e8]"></div>
-        <p className="mt-4 text-sm text-gray-500 font-medium animate-pulse">Loading course builder...</p>
+      <div className="min-h-[calc(100vh-80px)] flex flex-col items-center justify-center transition-colors" style={{ background: 'var(--bg-primary)' }}>
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+        <p className="mt-4 text-sm font-medium animate-pulse" style={{ color: 'var(--text-secondary)' }}>Loading course builder...</p>
       </div>
     );
   }
@@ -208,33 +207,39 @@ export default function CourseBuilder() {
   if (!course) return null;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8" style={{ background: 'var(--bg-primary)', minHeight: 'calc(100vh - 80px)' }}>
       
       {/* Header Area */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-gray-100">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b" style={{ borderColor: 'var(--border-color)' }}>
         <div className="flex items-center gap-4">
-          <Link href="/dashboard" className="p-2 rounded-full hover:bg-gray-100 text-gray-500 transition-colors">
+          <Link href="/dashboard" className="p-2 rounded-full transition-colors" style={{ color: 'var(--text-secondary)' }}
+            onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-muted)'}
+            onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+          >
             <ArrowLeft size={20} />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{course.title}</h1>
-            <p className="text-gray-500 text-sm mt-1 flex items-center gap-2">
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{course.title}</h1>
+            <p className="text-sm mt-1 flex items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
               Curriculum Builder
-              <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${course.status === 'published' ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-700'}`}>
+              <span className={`px-2 py-0.5 rounded-md text-xs font-bold ${course.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-500/20 dark:text-green-400' : 'bg-gray-200 text-gray-700 dark:bg-white/10 dark:text-gray-300'}`}>
                 {course.status.toUpperCase()}
               </span>
             </p>
           </div>
         </div>
         <div className="flex gap-3">
-          <button className="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors flex items-center gap-2">
+          <button
+            className="px-4 py-2 font-medium rounded-xl transition-colors flex items-center gap-2"
+            style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)', border: '1px solid var(--border-color)' }}
+          >
             <Settings size={16} /> Settings
           </button>
           <button 
             onClick={togglePublish}
             className={`px-4 py-2 font-medium rounded-xl transition-colors shadow-sm flex items-center gap-2 ${
               course.status === 'published' 
-                ? 'bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200' 
+                ? 'bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 dark:bg-orange-500/10 dark:text-orange-400 dark:border-orange-500/30' 
                 : 'bg-green-600 text-white hover:bg-green-700 shadow-green-200'
             }`}
           >
@@ -244,18 +249,21 @@ export default function CourseBuilder() {
       </div>
 
       {/* Course Thumbnail */}
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-        <div className="bg-gray-50 px-6 py-4 border-b border-gray-200">
-          <h2 className="font-bold text-gray-900">Course Thumbnail</h2>
-          <p className="text-xs text-gray-500 mt-0.5">This image is shown on the course catalog page. Best size: 800×450px.</p>
+      <div className="rounded-2xl overflow-hidden shadow-sm border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+        <div className="px-6 py-4 border-b" style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-color)' }}>
+          <h2 className="font-bold" style={{ color: 'var(--text-primary)' }}>Course Thumbnail</h2>
+          <p className="text-xs mt-0.5" style={{ color: 'var(--text-secondary)' }}>This image is shown on the course catalog page. Best size: 800×450px.</p>
         </div>
         <div className="p-6 flex flex-col sm:flex-row items-center gap-6">
           {/* Preview */}
-          <div className="w-full sm:w-72 h-40 rounded-xl overflow-hidden bg-gray-100 flex items-center justify-center border border-gray-200 flex-shrink-0">
+          <div
+            className="w-full sm:w-72 h-40 rounded-xl overflow-hidden flex items-center justify-center flex-shrink-0 border"
+            style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
+          >
             {course.thumbnail ? (
               <img src={course.thumbnail} alt="Thumbnail" className="w-full h-full object-cover" />
             ) : (
-              <div className="flex flex-col items-center gap-2 text-gray-400">
+              <div className="flex flex-col items-center gap-2" style={{ color: 'var(--text-secondary)' }}>
                 <Upload size={32} />
                 <span className="text-xs font-medium">No thumbnail yet</span>
               </div>
@@ -263,14 +271,14 @@ export default function CourseBuilder() {
           </div>
           {/* Upload button */}
           <div className="space-y-3">
-            <p className="text-sm text-gray-600">Upload a high-quality image (JPG, PNG, or WEBP) to make your course stand out.</p>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Upload a high-quality image (JPG, PNG, or WEBP) to make your course stand out.</p>
             {thumbnailUploading ? (
-              <div className="flex items-center gap-2.5 text-sm text-gray-500">
-                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#1a73e8]"></div>
+              <div className="flex items-center gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500"></div>
                 <span className="font-medium animate-pulse">Uploading to Cloudinary...</span>
               </div>
             ) : (
-              <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-200">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors shadow-md shadow-blue-200/50">
                 <Upload size={16} />
                 {course.thumbnail ? 'Replace Thumbnail' : 'Upload Thumbnail'}
                 <input
@@ -282,7 +290,7 @@ export default function CourseBuilder() {
               </label>
             )}
             {course.thumbnail && (
-              <p className="text-xs text-green-600 font-medium flex items-center gap-1">
+              <p className="text-xs text-green-600 dark:text-green-400 font-medium flex items-center gap-1">
                 <CheckCircle size={13} /> Thumbnail saved
               </p>
             )}
@@ -293,16 +301,16 @@ export default function CourseBuilder() {
       {/* Curriculum Area */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold text-gray-900">Course Curriculum</h2>
+          <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>Course Curriculum</h2>
         </div>
 
         <div className="space-y-4">
           {course.sections && course.sections.length === 0 && !isAddingSection && (
-            <div className="text-center py-12 bg-blue-50/50 rounded-2xl border border-dashed border-blue-200">
-              <p className="text-blue-800 font-medium mb-4">Start by adding your first section!</p>
+            <div className="text-center py-12 rounded-2xl border-2 border-dashed" style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-color)' }}>
+              <p className="font-medium mb-4" style={{ color: 'var(--text-primary)' }}>Start by adding your first section!</p>
               <button 
                 onClick={() => setIsAddingSection(true)}
-                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200 hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
+                className="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold shadow-lg shadow-blue-200/50 hover:bg-blue-700 transition-colors inline-flex items-center gap-2"
               >
                 <Plus size={18} /> Add Section
               </button>
@@ -311,11 +319,11 @@ export default function CourseBuilder() {
 
           {/* Render existing sections */}
           {course.sections && course.sections.map((section, index) => (
-            <div key={section._id} className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-              <div className="bg-gray-50 px-6 py-4 flex items-center justify-between border-b border-gray-200">
+            <div key={section._id} className="rounded-2xl overflow-hidden shadow-sm border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
+              <div className="px-6 py-4 flex items-center justify-between border-b" style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-color)' }}>
                 <div className="flex items-center gap-3">
-                  <GripVertical className="text-gray-400 cursor-grab" size={20} />
-                  <h3 className="font-bold text-gray-900">Section {index + 1}: {section.title}</h3>
+                  <GripVertical className="cursor-grab" size={20} style={{ color: 'var(--text-secondary)' }} />
+                  <h3 className="font-bold" style={{ color: 'var(--text-primary)' }}>Section {index + 1}: {section.title}</h3>
                 </div>
               </div>
               
@@ -324,72 +332,79 @@ export default function CourseBuilder() {
                 {section.lessons && section.lessons.length > 0 ? (
                   <div className="space-y-2">
                     {section.lessons.map((lesson, lIndex) => (
-                      <div key={lesson._id} className="flex items-center justify-between p-3 bg-white border border-gray-100 rounded-xl hover:border-blue-100 hover:shadow-sm transition-all group">
+                      <div
+                        key={lesson._id}
+                        className="flex items-center justify-between p-3 rounded-xl border transition-all group"
+                        style={{ background: 'var(--bg-elevated)', borderColor: 'var(--border-color)' }}
+                      >
                         <div className="flex items-center gap-3">
-                          <GripVertical className="text-gray-300 cursor-grab opacity-0 group-hover:opacity-100 transition-opacity" size={16} />
-                          <div className="bg-blue-50 p-2 rounded-lg text-blue-600">
+                          <GripVertical className="opacity-0 group-hover:opacity-100 transition-opacity cursor-grab" size={16} style={{ color: 'var(--text-secondary)' }} />
+                          <div className="bg-blue-50 dark:bg-blue-500/10 p-2 rounded-lg text-blue-600 dark:text-blue-400">
                             <Video size={16} />
                           </div>
-                          <span className="font-medium text-gray-700">Lesson {lIndex + 1}: {lesson.title}</span>
+                          <span className="font-medium" style={{ color: 'var(--text-primary)' }}>Lesson {lIndex + 1}: {lesson.title}</span>
                         </div>
-                        <span className="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-md">
+                        <span className="text-xs font-bold px-2 py-1 rounded-md" style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)' }}>
                           {lesson.duration} min
                         </span>
                       </div>
                     ))}
                   </div>
                 ) : (
-                  <p className="text-sm text-gray-500 italic pl-8">No lessons in this section yet.</p>
+                  <p className="text-sm italic pl-8" style={{ color: 'var(--text-secondary)' }}>No lessons in this section yet.</p>
                 )}
 
                 {/* Add Lesson UI */}
                 {addingLessonTo === section._id ? (
                   <div className="pl-8 pt-4">
-                    <form onSubmit={(e) => handleAddLesson(e, section._id)} className="bg-gray-50 p-4 rounded-xl border border-gray-200 space-y-4">
+                    <form onSubmit={(e) => handleAddLesson(e, section._id)} className="p-4 rounded-xl border space-y-4" style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-color)' }}>
                       <div>
-                        <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Lesson Title</label>
+                        <label className="block text-xs font-bold uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>Lesson Title</label>
                         <input 
                           type="text" 
                           required
                           value={newLessonData.title}
                           onChange={(e) => setNewLessonData({...newLessonData, title: e.target.value})}
                           placeholder="e.g. Setting up the environment"
-                          className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                          className="w-full px-3 py-2 rounded-lg border outline-none transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 text-sm"
+                          style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                         />
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Video URL (or auto-filled below)</label>
+                          <label className="block text-xs font-bold uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>Video URL (or auto-filled below)</label>
                           <input 
                             type="text" 
                             required
                             value={newLessonData.videoUrl}
                             onChange={(e) => setNewLessonData({...newLessonData, videoUrl: e.target.value})}
                             placeholder="https://..."
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            className="w-full px-3 py-2 rounded-lg border outline-none transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 text-sm"
+                            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                           />
                         </div>
                         <div>
-                          <label className="block text-xs font-bold text-gray-700 mb-1 uppercase">Duration (mins)</label>
+                          <label className="block text-xs font-bold uppercase mb-1" style={{ color: 'var(--text-secondary)' }}>Duration (mins)</label>
                           <input 
                             type="number" 
                             value={newLessonData.duration}
                             onChange={(e) => setNewLessonData({...newLessonData, duration: e.target.value})}
                             placeholder="10"
-                            className="w-full px-3 py-2 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                            className="w-full px-3 py-2 rounded-lg border outline-none transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 text-sm"
+                            style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                           />
                         </div>
                       </div>
 
                       {/* Video File Uploader */}
-                      <div className="bg-white p-3.5 rounded-xl border border-dashed border-gray-300 flex flex-col items-center justify-center">
+                      <div className="p-3.5 rounded-xl border-2 border-dashed flex flex-col items-center justify-center" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
                         {videoUploading ? (
-                          <div className="flex items-center gap-2.5 text-sm text-gray-500 py-1">
-                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-[#1a73e8]"></div>
+                          <div className="flex items-center gap-2.5 text-sm py-1" style={{ color: 'var(--text-secondary)' }}>
+                            <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-blue-500"></div>
                             <span className="font-medium animate-pulse">Uploading video to Cloudinary...</span>
                           </div>
                         ) : (
-                          <label className="cursor-pointer text-xs font-bold text-[#1a73e8] hover:text-[#1557b0] transition-colors flex items-center gap-1.5 py-1">
+                          <label className="cursor-pointer text-xs font-bold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors flex items-center gap-1.5 py-1">
                             <Upload size={15} /> Upload Video File (.mp4, .mov, etc.)
                             <input 
                               type="file" 
@@ -402,7 +417,12 @@ export default function CourseBuilder() {
                       </div>
 
                       <div className="flex justify-end gap-2 pt-2">
-                        <button type="button" onClick={() => setAddingLessonTo(null)} className="px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-200 rounded-lg transition-colors">
+                        <button
+                          type="button"
+                          onClick={() => setAddingLessonTo(null)}
+                          className="px-3 py-1.5 text-sm font-medium rounded-lg transition-colors"
+                          style={{ color: 'var(--text-secondary)', background: 'var(--bg-secondary)' }}
+                        >
                           Cancel
                         </button>
                         <button type="submit" className="px-3 py-1.5 text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm">
@@ -415,7 +435,7 @@ export default function CourseBuilder() {
                   <div className="pl-8">
                     <button 
                       onClick={() => setAddingLessonTo(section._id)}
-                      className="text-sm font-bold text-blue-600 flex items-center gap-1 hover:text-blue-800 transition-colors"
+                      className="text-sm font-bold text-blue-600 dark:text-blue-400 flex items-center gap-1 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
                     >
                       <Plus size={16} /> Add Lesson
                     </button>
@@ -427,9 +447,9 @@ export default function CourseBuilder() {
 
           {/* Add Section UI */}
           {isAddingSection ? (
-            <div className="bg-white border border-blue-200 rounded-2xl p-6 shadow-sm">
+            <div className="rounded-2xl p-6 shadow-sm border" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}>
               <form onSubmit={handleAddSection}>
-                <label className="block text-sm font-bold text-gray-700 mb-2">New Section Title</label>
+                <label className="block text-sm font-bold mb-2" style={{ color: 'var(--text-primary)' }}>New Section Title</label>
                 <div className="flex gap-4">
                   <input 
                     type="text" 
@@ -438,12 +458,18 @@ export default function CourseBuilder() {
                     value={newSectionTitle}
                     onChange={(e) => setNewSectionTitle(e.target.value)}
                     placeholder="e.g. Module 1: Basics"
-                    className="flex-1 px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+                    className="flex-1 px-4 py-2.5 rounded-xl border outline-none transition-all focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500"
+                    style={{ background: 'var(--bg-muted)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                   />
-                  <button type="button" onClick={() => setIsAddingSection(false)} className="px-4 py-2.5 font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors">
+                  <button
+                    type="button"
+                    onClick={() => setIsAddingSection(false)}
+                    className="px-4 py-2.5 font-medium rounded-xl transition-colors"
+                    style={{ color: 'var(--text-secondary)', background: 'var(--bg-muted)' }}
+                  >
                     Cancel
                   </button>
-                  <button type="submit" className="px-6 py-2.5 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200 transition-colors">
+                  <button type="submit" className="px-6 py-2.5 font-bold text-white bg-blue-600 hover:bg-blue-700 rounded-xl shadow-lg shadow-blue-200/50 transition-colors">
                     Save Section
                   </button>
                 </div>
@@ -453,7 +479,8 @@ export default function CourseBuilder() {
             course.sections && course.sections.length > 0 && (
               <button 
                 onClick={() => setIsAddingSection(true)}
-                className="w-full py-4 border-2 border-dashed border-gray-300 rounded-2xl text-gray-500 font-bold hover:border-blue-400 hover:text-blue-600 hover:bg-blue-50 transition-all flex items-center justify-center gap-2"
+                className="w-full py-4 border-2 border-dashed rounded-2xl font-bold hover:text-blue-600 dark:hover:text-blue-400 transition-all flex items-center justify-center gap-2"
+                style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
               >
                 <Plus size={20} /> Add Another Section
               </button>

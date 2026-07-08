@@ -9,10 +9,42 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log('MongoDB connected'))
-  .catch(err => console.error('MongoDB connection error:', err));
+let isConnected = false;
+
+const connectDB = async () => {
+  if (isConnected) {
+    return;
+  }
+  
+  if (!process.env.MONGODB_URI) {
+    console.error("MONGODB_URI is not defined in environment variables!");
+    throw new Error("Missing MONGODB_URI");
+  }
+
+  try {
+    // Set a 5-second timeout so it doesn't hang indefinitely if IP is not whitelisted
+    const db = await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 5000,
+    });
+    isConnected = db.connections[0].readyState === 1;
+    console.log('MongoDB connected successfully');
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    throw error;
+  }
+};
+
+// Middleware to ensure DB connection before handling any routes
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (err) {
+    res.status(500).json({ 
+      error: 'Database connection failed. Please check your Vercel Environment Variables and ensure your MongoDB Atlas Network Access allows all IPs (0.0.0.0/0).' 
+    });
+  }
+});
 
 // Routes
 app.use('/api/auth', require('./src/routes/auth'));

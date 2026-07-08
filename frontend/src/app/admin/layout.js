@@ -71,6 +71,7 @@ export default function AdminLayout({ children }) {
           {children}
         </div>
       </div>
+      </div>
     </ProtectedRoute>
   );
 }

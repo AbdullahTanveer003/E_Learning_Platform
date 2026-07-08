@@ -34,7 +34,7 @@ export default function CourseBuilder() {
 
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/upload/video', {
+      const res = await fetch('/api/upload/video', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -66,7 +66,7 @@ export default function CourseBuilder() {
     try {
       const token = sessionStorage.getItem('token');
       // 1. Upload image to Cloudinary
-      const uploadRes = await fetch('http://localhost:5000/api/upload/thumbnail', {
+      const uploadRes = await fetch('/api/upload/thumbnail', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
         body: formData
@@ -75,7 +75,7 @@ export default function CourseBuilder() {
       if (!uploadRes.ok) throw new Error(uploadData.error || 'Image upload failed');
 
       // 2. Save the thumbnail URL on the course record
-      const patchRes = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+      const patchRes = await fetch(`/api/courses/${courseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -96,7 +96,7 @@ export default function CourseBuilder() {
 
   const fetchCourse = async () => {
     try {
-      const res = await fetch(`http://localhost:5000/api/courses/${courseId}`);
+      const res = await fetch(`/api/courses/${courseId}`);
       if (!res.ok) throw new Error('Failed to fetch course');
       const data = await res.json();
       setCourse(data);
@@ -124,7 +124,7 @@ export default function CourseBuilder() {
 
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/courses/${courseId}/sections`, {
+      const res = await fetch(`/api/courses/${courseId}/sections`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -152,7 +152,7 @@ export default function CourseBuilder() {
 
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/courses/sections/${sectionId}/lessons`, {
+      const res = await fetch(`/api/courses/sections/${sectionId}/lessons`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -179,7 +179,7 @@ export default function CourseBuilder() {
     try {
       const token = sessionStorage.getItem('token');
       const newStatus = course.status === 'published' ? 'draft' : 'published';
-      const res = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+      const res = await fetch(`/api/courses/${courseId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

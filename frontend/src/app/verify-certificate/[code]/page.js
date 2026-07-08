@@ -14,7 +14,7 @@ export default function VerifyCertificate() {
   useEffect(() => {
     const verifyCode = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/api/certificates/verify/${code}`);
+        const res = await fetch(`/api/certificates/verify/${code}`);
         const data = await res.json();
         setVerification(data);
       } catch (err) {

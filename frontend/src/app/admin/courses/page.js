@@ -10,7 +10,7 @@ export default function AdminCourses() {
   const fetchCourses = async () => {
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/admin/courses', {
+      const res = await fetch('/api/admin/courses', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setCourses(await res.json());
@@ -30,7 +30,7 @@ export default function AdminCourses() {
     
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/admin/courses/${id}`, {
+      const res = await fetch(`/api/admin/courses/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

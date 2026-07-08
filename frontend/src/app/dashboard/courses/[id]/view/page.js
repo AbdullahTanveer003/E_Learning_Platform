@@ -30,7 +30,7 @@ export default function CourseViewer() {
         throw new Error('No authentication token found');
       }
       
-      const res = await fetch('http://localhost:5000/api/courses/enrolled/me', {
+      const res = await fetch('/api/courses/enrolled/me', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
@@ -120,7 +120,7 @@ export default function CourseViewer() {
       lastSavedTime.current = currentTime;
       try {
         const token = sessionStorage.getItem('token');
-        await fetch(`http://localhost:5000/api/courses/enrolled/${enrollment._id}/playback`, {
+        await fetch(`/api/courses/enrolled/${enrollment._id}/playback`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -144,7 +144,7 @@ export default function CourseViewer() {
     setCompletedLessonIds(prev => [...prev, activeLesson._id]);
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/courses/enrolled/${enrollment._id}/lessons/${activeLesson._id}/complete`, {
+      const res = await fetch(`/api/courses/enrolled/${enrollment._id}/lessons/${activeLesson._id}/complete`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

@@ -23,7 +23,7 @@ export default function QuizViewer() {
     const fetchQuiz = async () => {
       try {
         const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/api/quizzes/lesson/${lessonId}`, {
+        const res = await fetch(`/api/quizzes/lesson/${lessonId}`, {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         
@@ -64,7 +64,7 @@ export default function QuizViewer() {
         answer: answers[key]
       }));
 
-      const res = await fetch(`http://localhost:5000/api/quizzes/${quiz._id}/submit`, {
+      const res = await fetch(`/api/quizzes/${quiz._id}/submit`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -17,7 +17,7 @@ export const AuthProvider = ({ children }) => {
         
         if (storedToken) {
           // Validate token with backend
-          const res = await fetch('http://localhost:5000/api/auth/me', {
+          const res = await fetch('/api/auth/me', {
             headers: { 'Authorization': `Bearer ${storedToken}` }
           });
           

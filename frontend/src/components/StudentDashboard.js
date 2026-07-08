@@ -11,7 +11,7 @@ const StudentDashboard = ({ user }) => {
     const fetchEnrollments = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/courses/enrolled/me', {
+        const res = await fetch('/api/courses/enrolled/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -124,7 +124,7 @@ const StudentDashboard = ({ user }) => {
                 try {
                   const token = sessionStorage.getItem('token');
                   // 1. Issue certificate (or get existing)
-                  const issueRes = await fetch('http://localhost:5000/api/certificates/issue', {
+                  const issueRes = await fetch('/api/certificates/issue', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
                     body: JSON.stringify({ enrollmentId: enrollment._id })
@@ -135,7 +135,7 @@ const StudentDashboard = ({ user }) => {
                   const code = issueData.certificate.uniqueCode;
                   
                   // 2. Download PDF
-                  window.open(`http://localhost:5000/api/certificates/download/${code}`, '_blank');
+                  window.open(`/api/certificates/download/${code}`, '_blank');
                 } catch (err) {
                   alert(err.message);
                 }

@@ -20,12 +20,12 @@ export default function CoursesCatalog() {
         if (isTeacher) {
           // Teachers only see their own courses
           const token = sessionStorage.getItem('token');
-          res = await fetch('http://localhost:5000/api/courses/my-courses', {
+          res = await fetch('/api/courses/my-courses', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
         } else {
           // Students see all published courses
-          res = await fetch('http://localhost:5000/api/courses');
+          res = await fetch('/api/courses');
         }
         if (res.ok) {
           const data = await res.json();

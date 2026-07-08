@@ -11,7 +11,7 @@ export default function AdminUsers() {
   const fetchUsers = async () => {
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch('http://localhost:5000/api/admin/users', {
+      const res = await fetch('/api/admin/users', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (res.ok) setUsers(await res.json());
@@ -31,7 +31,7 @@ export default function AdminUsers() {
     
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+      const res = await fetch(`/api/admin/users/${id}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

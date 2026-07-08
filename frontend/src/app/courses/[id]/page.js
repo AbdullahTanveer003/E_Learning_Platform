@@ -21,7 +21,7 @@ export default function CourseDetails() {
     const fetchCourseAndEnrollment = async () => {
       try {
         // Fetch course details
-        const courseRes = await fetch(`http://localhost:5000/api/courses/${courseId}`);
+        const courseRes = await fetch(`/api/courses/${courseId}`);
         if (!courseRes.ok) throw new Error('Course not found');
         const courseData = await courseRes.json();
         setCourse(courseData);
@@ -29,7 +29,7 @@ export default function CourseDetails() {
         // Fetch enrollment status if logged in
         const token = sessionStorage.getItem('token');
         if (token && user && user.role === 'student') {
-          const enrolledRes = await fetch('http://localhost:5000/api/courses/enrolled/me', {
+          const enrolledRes = await fetch('/api/courses/enrolled/me', {
             headers: { 'Authorization': `Bearer ${token}` }
           });
           if (enrolledRes.ok) {
@@ -57,7 +57,7 @@ export default function CourseDetails() {
     setEnrollLoading(true);
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/courses/${courseId}/enroll`, {
+      const res = await fetch(`/api/courses/${courseId}/enroll`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

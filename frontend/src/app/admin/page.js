@@ -11,12 +11,12 @@ export default function AdminDashboard() {
     try {
       const token = sessionStorage.getItem('token');
       
-      const statsRes = await fetch('http://localhost:5000/api/admin/stats', {
+      const statsRes = await fetch('/api/admin/stats', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (statsRes.ok) setStats(await statsRes.json());
 
-      const teachersRes = await fetch('http://localhost:5000/api/admin/pending-teachers', {
+      const teachersRes = await fetch('/api/admin/pending-teachers', {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       if (teachersRes.ok) setPendingTeachers(await teachersRes.json());
@@ -35,7 +35,7 @@ export default function AdminDashboard() {
   const handleApprove = async (id) => {
     try {
       const token = sessionStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/admin/approve-teacher/${id}`, {
+      await fetch(`/api/admin/approve-teacher/${id}`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}` }
       });

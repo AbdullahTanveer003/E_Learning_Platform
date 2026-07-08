@@ -13,7 +13,7 @@ const TeacherDashboard = ({ user }) => {
     const fetchCourses = async () => {
       try {
         const token = sessionStorage.getItem('token');
-        const res = await fetch('http://localhost:5000/api/courses/my-courses', {
+        const res = await fetch('/api/courses/my-courses', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -23,7 +23,7 @@ const TeacherDashboard = ({ user }) => {
           setCourses(data);
         }
 
-        const revRes = await fetch('http://localhost:5000/api/courses/my-revenue', {
+        const revRes = await fetch('/api/courses/my-revenue', {
           headers: { 'Authorization': `Bearer ${token}` }
         });
         if (revRes.ok) {
@@ -46,7 +46,7 @@ const TeacherDashboard = ({ user }) => {
     setDeletingId(courseId);
     try {
       const token = sessionStorage.getItem('token');
-      const res = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
+      const res = await fetch(`/api/courses/${courseId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });

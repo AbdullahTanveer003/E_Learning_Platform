@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { Trash2, AlertTriangle } from 'lucide-react';
-import { useAuth } from '../../../../../context/AuthContext';
+import { useAuth } from '../../../context/AuthContext';
 
 export default function AdminUsers() {
   const [users, setUsers] = useState([]);

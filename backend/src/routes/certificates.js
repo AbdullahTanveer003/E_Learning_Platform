@@ -1,5 +1,6 @@
 const express = require('express');
 const crypto = require('crypto');
+const PDFDocument = require('pdfkit');
 const Certificate = require('../models/Certificate');
 const Enrollment = require('../models/Enrollment');
 const authMiddleware = require('../middleware/auth');
@@ -89,6 +90,82 @@ router.get('/verify/:code', async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
+  }
+});
+
+// GET /api/certificates/download/:code — generate and stream PDF
+router.get('/download/:code', async (req, res) => {
+  try {
+    const certificate = await Certificate.findOne({ uniqueCode: req.params.code })
+      .populate('student', 'name')
+      .populate('course', 'title');
+
+    if (!certificate) {
+      return res.status(404).json({ error: 'Certificate not found' });
+    }
+
+    const doc = new PDFDocument({
+      layout: 'landscape',
+      size: 'A4',
+    });
+
+    // Set response headers for PDF download
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader(
+      'Content-Disposition',
+      `attachment; filename=Certificate_${certificate.uniqueCode}.pdf`
+    );
+
+    // Pipe PDF to response
+    doc.pipe(res);
+
+    // Add content to PDF
+    doc.rect(0, 0, doc.page.width, doc.page.height).fill('#f9fafb');
+
+    // Add border
+    doc.rect(20, 20, doc.page.width - 40, doc.page.height - 40)
+       .lineWidth(5)
+       .stroke('#3b82f6'); // Tailwind blue-500
+
+    doc.fillColor('#1e40af') // Tailwind blue-800
+       .fontSize(40)
+       .text('Certificate of Completion', { align: 'center', margin: 50 });
+
+    doc.moveDown();
+    doc.fillColor('#374151')
+       .fontSize(20)
+       .text('This is to certify that', { align: 'center' });
+
+    doc.moveDown();
+    doc.fillColor('#111827')
+       .fontSize(30)
+       .text(certificate.student.name, { align: 'center' });
+
+    doc.moveDown();
+    doc.fillColor('#374151')
+       .fontSize(20)
+       .text('has successfully completed the course', { align: 'center' });
+
+    doc.moveDown();
+    doc.fillColor('#1e40af')
+       .fontSize(25)
+       .text(certificate.course.title, { align: 'center' });
+
+    doc.moveDown(2);
+    doc.fillColor('#6b7280')
+       .fontSize(14)
+       .text(`Issued on: ${new Date(certificate.issueDate).toLocaleDateString()}`, { align: 'center' });
+    
+    doc.text(`Certificate ID: ${certificate.uniqueCode}`, { align: 'center' });
+    
+    doc.moveDown();
+    doc.text('Verify at: https://yourdomain.com/verify-certificate/' + certificate.uniqueCode, { align: 'center' });
+
+    doc.end();
+  } catch (error) {
+    if (!res.headersSent) {
+      res.status(500).json({ error: error.message });
+    }
   }
 });
 

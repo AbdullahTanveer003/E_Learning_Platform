@@ -33,7 +33,7 @@ export default function CourseBuilder() {
     formData.append('video', file);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await fetch('http://localhost:5000/api/upload/video', {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}` },
@@ -64,7 +64,7 @@ export default function CourseBuilder() {
     formData.append('thumbnail', file);
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       // 1. Upload image to Cloudinary
       const uploadRes = await fetch('http://localhost:5000/api/upload/thumbnail', {
         method: 'POST',
@@ -123,7 +123,7 @@ export default function CourseBuilder() {
     if (!newSectionTitle.trim()) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/courses/${courseId}/sections`, {
         method: 'POST',
         headers: {
@@ -151,7 +151,7 @@ export default function CourseBuilder() {
     if (!newLessonData.title.trim() || !newLessonData.videoUrl.trim()) return;
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/courses/sections/${sectionId}/lessons`, {
         method: 'POST',
         headers: {
@@ -177,7 +177,7 @@ export default function CourseBuilder() {
 
   const togglePublish = async () => {
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const newStatus = course.status === 'published' ? 'draft' : 'published';
       const res = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
         method: 'PUT',

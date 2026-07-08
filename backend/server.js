@@ -18,8 +18,8 @@ mongoose.connect(process.env.MONGODB_URI)
 app.use('/api/auth', require('./src/routes/auth'));
 app.use('/api/courses', require('./src/routes/courses'));
 app.use('/api/upload', require('./src/routes/upload'));
-app.use('/api/quizzes', require('./src/routes/quizzes'));
 app.use('/api/certificates', require('./src/routes/certificates'));
+app.use('/api/admin', require('./src/routes/admin'));
 
 app.get('/api/health', (req, res) => {
   res.json({ message: 'Server is running' });

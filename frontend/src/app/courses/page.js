@@ -19,7 +19,7 @@ export default function CoursesCatalog() {
         let res;
         if (isTeacher) {
           // Teachers only see their own courses
-          const token = localStorage.getItem('token');
+          const token = sessionStorage.getItem('token');
           res = await fetch('http://localhost:5000/api/courses/my-courses', {
             headers: { 'Authorization': `Bearer ${token}` }
           });

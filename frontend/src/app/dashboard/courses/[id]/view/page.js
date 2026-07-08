@@ -24,7 +24,7 @@ export default function CourseViewer() {
   const fetchEnrollment = async () => {
     try {
       console.log('Fetching enrollments for courseId:', courseId);
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       
       if (!token) {
         throw new Error('No authentication token found');
@@ -87,7 +87,9 @@ export default function CourseViewer() {
 
   // Resume playback position when active lesson changes
   useEffect(() => {
-    if (!activeLesson || !enrollment || !videoRef.current) return;
+    if (!activeLesson) return;
+
+    if (!enrollment || !videoRef.current) return;
 
     const savedPosition = enrollment.playbackPositions?.find(
       pos => pos.lessonId === activeLesson._id
@@ -117,7 +119,7 @@ export default function CourseViewer() {
     if (Math.abs(currentTime - lastSavedTime.current) > 5) {
       lastSavedTime.current = currentTime;
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         await fetch(`http://localhost:5000/api/courses/enrolled/${enrollment._id}/playback`, {
           method: 'POST',
           headers: {
@@ -133,33 +135,33 @@ export default function CourseViewer() {
         console.error('Failed to save playback position:', err);
       }
     }
+  };
 
-    // 2. Watch percentage tracking (80% completion check)
-    const watchedRatio = currentTime / duration;
-    if (watchedRatio >= 0.8 && !completedLessonIds.includes(activeLesson._id)) {
-      // Optimistically add to completion
-      setCompletedLessonIds(prev => [...prev, activeLesson._id]);
-      try {
-        const token = localStorage.getItem('token');
-        const res = await fetch(`http://localhost:5000/api/courses/enrolled/${enrollment._id}/lessons/${activeLesson._id}/complete`, {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-        
-        if (res.ok) {
-          const data = await res.json();
-          // Update total enrollment progress stats
-          setEnrollment(prev => ({
-            ...prev,
-            progress: data.progress,
-            completedLessons: data.completedLessons
-          }));
+  const handleMarkAsDone = async () => {
+    if (!activeLesson || !enrollment) return;
+    
+    // Optimistically add to completion
+    setCompletedLessonIds(prev => [...prev, activeLesson._id]);
+    try {
+      const token = sessionStorage.getItem('token');
+      const res = await fetch(`http://localhost:5000/api/courses/enrolled/${enrollment._id}/lessons/${activeLesson._id}/complete`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
         }
-      } catch (err) {
-        console.error('Failed to mark lesson completed:', err);
+      });
+      
+      if (res.ok) {
+        const data = await res.json();
+        // Update total enrollment progress stats
+        setEnrollment(prev => ({
+          ...prev,
+          progress: data.progress,
+          completedLessons: data.completedLessons
+        }));
       }
+    } catch (err) {
+      console.error('Failed to mark lesson completed:', err);
     }
   };
 
@@ -235,6 +237,21 @@ export default function CourseViewer() {
             <div className="flex items-center gap-2 text-sm text-gray-400 pt-1">
               <Clock size={16} />
               <span>Est. duration: {activeLesson.duration || 10} minutes</span>
+            </div>
+            <div className="flex items-center justify-between gap-2 mt-4 pt-4 border-t border-gray-800">
+              <div className="flex gap-4">
+                <button
+                  onClick={handleMarkAsDone}
+                  disabled={completedLessonIds.includes(activeLesson._id)}
+                  className={`px-6 py-2 rounded-lg font-medium transition-colors text-sm h-fit ${
+                    completedLessonIds.includes(activeLesson._id)
+                      ? 'bg-green-600/20 text-green-500 cursor-not-allowed'
+                      : 'bg-gray-800 text-white hover:bg-gray-700'
+                  }`}
+                >
+                  {completedLessonIds.includes(activeLesson._id) ? 'Completed' : 'Mark as Done'}
+                </button>
+              </div>
             </div>
           </div>
         )}

@@ -27,7 +27,7 @@ export default function CourseDetails() {
         setCourse(courseData);
 
         // Fetch enrollment status if logged in
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         if (token && user && user.role === 'student') {
           const enrolledRes = await fetch('http://localhost:5000/api/courses/enrolled/me', {
             headers: { 'Authorization': `Bearer ${token}` }
@@ -56,7 +56,7 @@ export default function CourseDetails() {
 
     setEnrollLoading(true);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/courses/${courseId}/enroll`, {
         method: 'POST',
         headers: {

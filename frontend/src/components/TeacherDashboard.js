@@ -5,13 +5,14 @@ import { Plus, BookOpen, Users, DollarSign, Edit, Trash2 } from 'lucide-react';
 
 const TeacherDashboard = ({ user }) => {
   const [courses, setCourses] = useState([]);
+  const [revenue, setRevenue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
 
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const res = await fetch('http://localhost:5000/api/courses/my-courses', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -20,6 +21,14 @@ const TeacherDashboard = ({ user }) => {
         if (res.ok) {
           const data = await res.json();
           setCourses(data);
+        }
+
+        const revRes = await fetch('http://localhost:5000/api/courses/my-revenue', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (revRes.ok) {
+          const revData = await revRes.json();
+          setRevenue(revData.totalRevenue);
         }
       } catch (err) {
         console.error("Failed to fetch courses:", err);
@@ -36,7 +45,7 @@ const TeacherDashboard = ({ user }) => {
     
     setDeletingId(courseId);
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await fetch(`http://localhost:5000/api/courses/${courseId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
@@ -96,7 +105,7 @@ const TeacherDashboard = ({ user }) => {
           </div>
           <div>
             <p className="text-sm font-medium" style={{color:'var(--text-secondary)'}}>Total Revenue</p>
-            <p className="text-2xl font-semibold mt-1" style={{color:'var(--text-primary)'}}>$0</p>
+            <p className="text-2xl font-semibold mt-1" style={{color:'var(--text-primary)'}}>${revenue}</p>
           </div>
         </div>
       </div>

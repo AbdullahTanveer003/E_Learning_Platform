@@ -11,20 +11,32 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const initializeAuth = () => {
+    const initializeAuth = async () => {
       try {
-        const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('user');
+        const storedToken = sessionStorage.getItem('token');
         
-        if (storedToken && storedUser) {
-          setUser(JSON.parse(storedUser));
+        if (storedToken) {
+          // Validate token with backend
+          const res = await fetch('http://localhost:5000/api/auth/me', {
+            headers: { 'Authorization': `Bearer ${storedToken}` }
+          });
+          
+          if (res.ok) {
+            const userData = await res.json();
+            setUser(userData);
+            sessionStorage.setItem('user', JSON.stringify(userData)); // Update local storage with fresh data
+          } else {
+            // Token is invalid or expired
+            throw new Error('Invalid token');
+          }
         } else {
           setUser(null);
         }
       } catch (err) {
-        console.error("Failed to parse auth data:", err);
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        console.error("Auth validation failed:", err);
+        sessionStorage.removeItem('token');
+        sessionStorage.removeItem('user');
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -42,31 +54,19 @@ export const AuthProvider = ({ children }) => {
     return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
-  // Watch route changes to enforce role protection
-  useEffect(() => {
-    if (loading) return;
-
-    const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/courses');
-    const isTeacherRoute = pathname.startsWith('/dashboard/create-course') || pathname.endsWith('/edit');
-    
-    if (isProtectedRoute && !user) {
-      router.push('/login');
-    } else if (isTeacherRoute && user && user.role !== 'teacher' && user.role !== 'admin') {
-      // Direct student away from teacher dashboards
-      router.push('/dashboard');
-    }
-  }, [pathname, user, loading, router]);
+  // ProtectedRoute component handles route protection now.
+  // We just need to expose the context.
 
   const login = (token, userData) => {
-    localStorage.setItem('token', token);
-    localStorage.setItem('user', JSON.stringify(userData));
+    sessionStorage.setItem('token', token);
+    sessionStorage.setItem('user', JSON.stringify(userData));
     setUser(userData);
     router.push('/dashboard');
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    sessionStorage.removeItem('token');
+    sessionStorage.removeItem('user');
     setUser(null);
     router.push('/login');
   };

@@ -10,7 +10,7 @@ const StudentDashboard = ({ user }) => {
   useEffect(() => {
     const fetchEnrollments = async () => {
       try {
-        const token = localStorage.getItem('token');
+        const token = sessionStorage.getItem('token');
         const res = await fetch('http://localhost:5000/api/courses/enrolled/me', {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -117,6 +117,29 @@ const StudentDashboard = ({ user }) => {
                 console.log('Card clicked for course:', course._id);
                 window.location.href = `/dashboard/courses/${course._id}/view`;
               };
+
+              const handleDownloadCertificate = async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                try {
+                  const token = sessionStorage.getItem('token');
+                  // 1. Issue certificate (or get existing)
+                  const issueRes = await fetch('http://localhost:5000/api/certificates/issue', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ enrollmentId: enrollment._id })
+                  });
+                  const issueData = await issueRes.json();
+                  if (!issueRes.ok) throw new Error(issueData.error);
+                  
+                  const code = issueData.certificate.uniqueCode;
+                  
+                  // 2. Download PDF
+                  window.open(`http://localhost:5000/api/certificates/download/${code}`, '_blank');
+                } catch (err) {
+                  alert(err.message);
+                }
+              };
               
               return (
                 <div 
@@ -173,12 +196,22 @@ const StudentDashboard = ({ user }) => {
                     <p className="text-sm" style={{color:'var(--text-secondary)'}}>
                       Instructor: <span className="font-medium" style={{color:'var(--text-primary)'}}>{course.teacher?.name || 'Expert'}</span>
                     </p>
-                    <button 
-                      onClick={handleResumeClick}
-                      className="google-btn google-btn-outline !py-1.5 !px-4 text-xs hover:!bg-blue-50 active:!bg-blue-100"
-                    >
-                      Resume Lesson
-                    </button>
+                    <div className="flex gap-2">
+                      {enrollment.progress === 100 && (
+                        <button 
+                          onClick={handleDownloadCertificate}
+                          className="google-btn !bg-green-600 hover:!bg-green-700 !text-white !py-1.5 !px-4 text-xs shadow-md"
+                        >
+                          Certificate
+                        </button>
+                      )}
+                      <button 
+                        onClick={handleResumeClick}
+                        className="google-btn google-btn-outline !py-1.5 !px-4 text-xs hover:!bg-blue-50 active:!bg-blue-100"
+                      >
+                        {enrollment.progress === 100 ? 'Review Lesson' : 'Resume Lesson'}
+                      </button>
+                    </div>
                   </div>
                 </div>
               );
@@ -186,6 +219,7 @@ const StudentDashboard = ({ user }) => {
           </div>
         )}
       </div>
+
     </div>
   );
 };

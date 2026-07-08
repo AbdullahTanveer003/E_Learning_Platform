@@ -29,7 +29,7 @@ export default function CreateCourse() {
     setError('');
 
     try {
-      const token = localStorage.getItem('token');
+      const token = sessionStorage.getItem('token');
       const res = await fetch('http://localhost:5000/api/courses', {
         method: 'POST',
         headers: { 

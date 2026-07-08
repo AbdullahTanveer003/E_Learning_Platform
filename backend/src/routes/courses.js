@@ -54,6 +54,26 @@ router.get('/my-courses', authMiddleware, roleMiddleware(['teacher']), async (re
   }
 });
 
+// Get teacher's total revenue
+router.get('/my-revenue', authMiddleware, roleMiddleware(['teacher']), async (req, res) => {
+  try {
+    const courses = await Course.find({ teacher: req.userId });
+    const courseIds = courses.map(c => c._id);
+    
+    // Find all enrollments for these courses
+    const enrollments = await Enrollment.find({ course: { $in: courseIds } }).populate('course', 'price');
+    
+    // Calculate total revenue
+    const totalRevenue = enrollments.reduce((sum, enrollment) => {
+      return sum + (enrollment.course?.price || 0);
+    }, 0);
+    
+    res.json({ totalRevenue });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // ⚠️ IMPORTANT: /enrolled/me MUST be before /:id so Express doesn't treat 'enrolled' as a course ID
 // Import Enrollment model at top scope
 const Enrollment = require('../models/Enrollment');
@@ -306,14 +326,7 @@ router.post('/enrolled/:id/playback', authMiddleware, roleMiddleware(['student']
 // Mark lesson as completed and recalculate course progress percentage
 router.post('/enrolled/:id/lessons/:lessonId/complete', authMiddleware, roleMiddleware(['student']), async (req, res) => {
   try {
-    const enrollment = await Enrollment.findOne({ _id: req.params.id, student: req.userId })
-      .populate({
-        path: 'course',
-        populate: {
-          path: 'sections',
-          populate: { path: 'lessons' }
-        }
-      });
+    const enrollment = await Enrollment.findOne({ _id: req.params.id, student: req.userId });
       
     if (!enrollment) {
       return res.status(404).json({ error: 'Enrollment record not found' });
@@ -327,8 +340,10 @@ router.post('/enrolled/:id/lessons/:lessonId/complete', authMiddleware, roleMidd
 
     // Calculate total lessons in this course
     let totalLessonsCount = 0;
-    for (const section of enrollment.course.sections) {
-      totalLessonsCount += section.lessons.length;
+    const sections = await Section.find({ course: enrollment.course });
+    for (const section of sections) {
+      const count = await Lesson.countDocuments({ section: section._id });
+      totalLessonsCount += count;
     }
 
     if (totalLessonsCount > 0) {
